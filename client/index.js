@@ -22,8 +22,13 @@ form.addEventListener("submit", async (e) => {
       },
       body: JSON.stringify({ username, password }),
     });
-    console.log(response.status, response.statusText, response.url);
-    show_result();
+    const result = await response.json();
+    console.log(result);
+    if (!result.error) {
+      show_result();
+    } else {
+      alert(result.error);
+    }
   } catch (error) {
     console.log(error);
   }
