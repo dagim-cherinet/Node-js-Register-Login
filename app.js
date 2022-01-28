@@ -2,7 +2,8 @@ const express = require("express");
 const connectDB = require("./connect");
 const User = require("./user");
 const bcrypt = require("bcryptjs");
-
+const jwt = require("jsonwebtoken");
+const JWT_STRING = "kfkjfkjfdkjakdjferuej#$#$#2u3@#@$@kfj";
 const app = express();
 const PORT = 3000;
 const url =
@@ -65,6 +66,49 @@ app.delete("/api/users/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.json({ status: "error" });
+  }
+});
+//authenticaion
+app.post("/api/users/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.json({ status: "error", error: "invalid username/password" });
+    }
+    if (await bcrypt.compare(password, user.password)) {
+      const token = jwt.sign(
+        {
+          _id: user._id,
+          username,
+        },
+        JWT_STRING
+      );
+      return res.json({ status: "ok", data: token });
+    }
+    res.json({ status: "error", error: "invalid username/password" });
+  } catch (error) {
+    console.log(error);
+    //return res.json({ status: error });
+  }
+});
+app.use("/api/users/change-password", async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const user = jwt.verify(token, JWT_STRING);
+    // console.log(user);
+    const newPassword = await bcrypt.hash(password, 10);
+
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: { password: newPassword },
+      }
+    );
+    return res.json({ status: "ok" });
+  } catch (error) {
+    console.log(error);
   }
 });
 
