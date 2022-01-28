@@ -23,11 +23,40 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({ username, password }),
     });
     console.log(response.status, response.statusText, response.url);
+    show_result();
   } catch (error) {
     console.log(error);
   }
 });
+const show_result = async () => {
+  try {
+    const response = await fetch("/api/users/");
+    const data = await response.json();
 
+    console.log(data);
+    const allUsers = data
+      .map((user) => {
+        const { username, password, _id: userID } = user;
+        return `<tr>
+      <td>${username}</td>
+      <td>  ${password}</td>
+      <td><button class="btn" onclick ="delete_user(this)" data-id ="${userID}">delete</button></td>
+       </tr> 
+        `;
+      })
+      .join("");
+
+    user__container.innerHTML = `<table>
+  <tr>
+     <th>username</th>
+     <th>password</th>
+  </tr>
+ ${allUsers}
+    </table>`;
+  } catch (error) {
+    console.log(error);
+  }
+};
 btn.addEventListener("click", async () => {
   try {
     const response = await fetch("/api/users/");
@@ -40,7 +69,7 @@ btn.addEventListener("click", async () => {
         return `<tr>
       <td>${username}</td>
       <td>  ${password}</td>
-      <td><button onclick ="delete" data-id ="${userID}">delete</button></td>
+      <td><button class="btn" onclick ="delete_user(this)" data-id ="${userID}">delete</button></td>
        </tr> 
         `;
       })
@@ -57,3 +86,21 @@ btn.addEventListener("click", async () => {
     console.log(error);
   }
 });
+
+const delete_user = async (x) => {
+  // const btn = document.querySelector(".btn");
+  const userID = x.dataset.id.toString();
+  console.log(userID);
+  try {
+    const response = await fetch(`/api/users/${userID}`, {
+      method: "DELETE", // Method itself
+      headers: {
+        "Content-type": "application/json; charset=UTF-8", // Indicates the content
+      },
+    });
+    console.log(response.status, response.ok);
+    show_result();
+  } catch (error) {
+    console.log(error);
+  }
+};

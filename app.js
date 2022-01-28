@@ -21,6 +21,11 @@ app.get("/api/users/:id", async (req, res) => {
   const singleUser = await User.findOne({ _id: user });
   res.json(singleUser);
 });
+app.delete("/api/users/:id", async (req, res) => {
+  const { id: user } = req.params;
+  const singleUser = await User.findOneAndDelete({ _id: user });
+  res.json(singleUser);
+});
 
 const start = async () => {
   try {
