@@ -1,6 +1,6 @@
 const express = require("express");
 const connectDB = require("./connect");
-const User = require("./user");
+const { User, Data } = require("./model/model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const JWT_STRING = "kfkjfkjfdkjakdjferuej#$#$#2u3@#@$@kfj";
@@ -111,7 +111,33 @@ app.use("/api/users/change-password", async (req, res) => {
     console.log(error);
   }
 });
-
+app.post("/api/user-specific-data", async (req, res) => {
+  const {
+    token,
+    data: { hobby, club },
+  } = req.body;
+  const user = jwt.verify(token, JWT_STRING);
+  //console.log(user);
+  try {
+    const userID = user._id;
+    await Data.create({ userID, hobby, club });
+    res.json({ status: "ok" });
+  } catch (error) {
+    console.log(error);
+    res.json({ status: error, error: "unkown" });
+  }
+});
+app.get("/api/get-user-profile/:token", async (req, res) => {
+  const { token } = req.params;
+  const user = jwt.verify(token, JWT_STRING);
+  const id = user._id;
+  try {
+    const data = await Data.find({ userID: id });
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+});
 const start = async () => {
   try {
     await connectDB(url);
