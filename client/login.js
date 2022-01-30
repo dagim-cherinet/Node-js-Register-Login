@@ -22,7 +22,8 @@ form.addEventListener("submit", async (e) => {
     if (!result.error) {
       alert("login Successful, welcome!!");
       localStorage.setItem("token", result.data);
-      user__container.innerHTML = `<a href ="./profile.html"><button>my profile</button></a>`;
+      location.replace("./profile.html");
+      //user__container.innerHTML = `<a href ="./profile.html"><button>my profile</button></a>`;
     } else {
       alert(result.error);
     }

@@ -3,6 +3,7 @@ const usernameInputDOM = document.getElementById("username");
 const passwordInputDOM = document.getElementById("password");
 const view__profile__btn = document.querySelector(".btn");
 const profile__container = document.querySelector(".user__container");
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -32,7 +33,13 @@ form.addEventListener("submit", async (e) => {
 });
 view__profile__btn.addEventListener("click", async () => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`/api/get-user-profile/${token}`);
+  const response = await fetch("/api/get-user-profile", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ token }),
+  });
 
   const result = await response.json();
   console.log(result);
@@ -57,3 +64,8 @@ view__profile__btn.addEventListener("click", async () => {
  ${usersProfile}
     </table>`;
 });
+
+const logout = () => {
+  localStorage.removeItem("token");
+  location.replace("login.html");
+};

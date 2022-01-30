@@ -127,9 +127,12 @@ app.post("/api/user-specific-data", async (req, res) => {
     res.json({ status: error, error: "unkown" });
   }
 });
-app.get("/api/get-user-profile/:token", async (req, res) => {
-  const { token } = req.params;
+app.post("/api/get-user-profile", async (req, res) => {
+  const { token } = req.body;
   const user = jwt.verify(token, JWT_STRING);
+  if (!user) {
+    return res.json({ status: "error", error: "authentication failed" });
+  }
   const id = user._id;
   try {
     const data = await Data.find({ userID: id });
